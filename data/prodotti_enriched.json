@@ -1,0 +1,28 @@
+[
+  {
+    "codice": "130419S",
+    "articolo": "Vassoio • 500x375x160 mm",
+    "tipologia": "Vassoio",
+    "settore": "Pasticceria",
+    "linea": "FIBRA ROSSO",
+    "materiale": "Cartoncino FIBRA",
+    "eco": "PAP 21",
+    "stagionale": false,
+    "brevettato": false,
+    "capacita": "",
+    "accessori": [
+      "Coperchio trasparente",
+      "Disco alimentare"
+    ],
+    "image": "assets/linea_FIBRA.svg",
+    "varianti": [
+      {
+        "codice": "130419S",
+        "size": "500x375x160",
+        "confezione": "25 pz",
+        "prezzoAnonimo": 2.3,
+        "prezzoPersonalizzato": 2.7
+      }
+    ]
+  }
+]
