@@ -109,6 +109,7 @@
   const ProductCard = ({ product }) => {
     const image = product.image || 'assets/default.svg';
     const labels = [];
+    if (product.palette) labels.push(product.palette);
     if (product.stagionale) labels.push('Stagionale');
     if (product.brevettato) labels.push('Brevettato');
 
@@ -168,6 +169,11 @@
           ),
         ]),
       ]),
+      product.smaltimento &&
+        React.createElement('div', { key: 'smaltimento', className: 'border-t pt-3 text-xs text-neutral-500 leading-relaxed' }, [
+          React.createElement('h3', { className: 'text-sm font-medium text-neutral-700 mb-1' }, 'Guida allo smaltimento'),
+          React.createElement('p', null, product.smaltimento),
+        ]),
     ]);
   };
 
@@ -186,7 +192,7 @@
     useEffect(() => {
       let cancelled = false;
       setStatus('loading');
-      fetch('data/prodotti_enriched.json')
+      fetch('data/catalogo.json')
         .then((response) => {
           if (!response.ok) {
             throw new Error('Impossibile caricare il catalogo (' + response.status + ')');
@@ -235,6 +241,8 @@
           product.linea,
           product.materiale,
           product.eco,
+          product.palette,
+          product.smaltimento,
           ...(product.varianti || []).flatMap((variant) => [variant.codice, variant.size]),
         ]
           .filter(Boolean)
@@ -273,7 +281,7 @@
         linee,
       }),
       React.createElement('div', { key: 'summary', className: 'flex items-center justify-between mb-4 text-sm text-neutral-600' }, [
-        React.createElement('span', { key: 'count' }, `${filteredProducts.length} varianti visibili su ${products.length}`),
+        React.createElement('span', { key: 'count' }, `${filteredProducts.length} articoli visibili su ${products.length}`),
         (onlySeasonal || onlyPatented || settore !== 'all' || tipologia !== 'all' || linea !== 'all' || query) &&
           React.createElement('button', {
             key: 'reset',
@@ -290,7 +298,7 @@
       ].filter(Boolean)),
       filteredProducts.length === 0
         ? React.createElement('div', { key: 'empty', className: 'py-20 text-center text-neutral-500 border border-dashed rounded-xl' }, [
-            React.createElement('p', { key: 'title', className: 'text-lg font-medium text-neutral-700' }, 'Nessuna variante trovata'),
+            React.createElement('p', { key: 'title', className: 'text-lg font-medium text-neutral-700' }, 'Nessun articolo trovato'),
             React.createElement('p', { key: 'hint', className: 'mt-2 text-sm' }, 'Modifica la ricerca o reimposta i filtri per vedere più risultati.'),
           ])
         : React.createElement('div', { key: 'grid', className: 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' },
