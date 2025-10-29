@@ -13,9 +13,12 @@
     onColoreChange,
     varianti,
     colori,
+    query,
+    onQueryChange,
     onReset,
   }) => {
-    const hasFilters = variante !== 'all' || colore !== 'all';
+    const hasFilters =
+      variante !== 'all' || colore !== 'all' || (query ?? '').trim() !== '';
 
     return React.createElement(
       'section',
@@ -23,8 +26,30 @@
       [
         React.createElement(
           'div',
-          { key: 'controls', className: 'grid gap-4 sm:grid-cols-2' },
+          {
+            key: 'controls',
+            className: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end',
+          },
           [
+            React.createElement(
+              'div',
+              { key: 'query', className: 'sm:col-span-2 lg:col-span-1' },
+              [
+                React.createElement(
+                  'label',
+                  { className: 'block text-sm font-medium text-neutral-700 mb-1' },
+                  'Ricerca libera'
+                ),
+                React.createElement('input', {
+                  type: 'search',
+                  value: query,
+                  onChange: (event) => onQueryChange(event.target.value),
+                  placeholder: 'Cerca codice, descrizione, formato…',
+                  className:
+                    'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
+                }),
+              ]
+            ),
             React.createElement(
               'div',
               { key: 'variante' },
@@ -237,6 +262,7 @@
 
     const [variante, setVariante] = useState('all');
     const [colore, setColore] = useState('all');
+    const [query, setQuery] = useState('');
 
     useEffect(() => {
       let cancelled = false;
@@ -278,12 +304,28 @@
     );
 
     const filteredProducts = useMemo(() => {
+      const normalizedQuery = query.trim().toLowerCase();
       return products.filter((product) => {
         if (variante !== 'all' && product.variante !== variante) return false;
         if (colore !== 'all' && (product.colore || product.linea) !== colore) return false;
+        if (normalizedQuery) {
+          const haystack = [
+            product.codice,
+            product.descrizione,
+            product.formato,
+            product.cartone,
+            product.variante,
+            product.colore,
+            product.linea,
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+          if (!haystack.includes(normalizedQuery)) return false;
+        }
         return true;
       });
-    }, [products, variante, colore]);
+    }, [products, variante, colore, query]);
 
     if (status === 'loading') {
       return React.createElement(
@@ -313,9 +355,12 @@
           onColoreChange: setColore,
           varianti,
           colori,
+          query,
+          onQueryChange: setQuery,
           onReset: () => {
             setVariante('all');
             setColore('all');
+            setQuery('');
           },
         }),
         React.createElement(
