@@ -1,223 +1,247 @@
-(function(){
+(function () {
   const { useState, useEffect, useMemo } = React;
 
-  const uniqSorted = (items) => {
-    return Array.from(new Set(items.filter(Boolean))).sort((a, b) =>
+  const uniqSorted = (items) =>
+    Array.from(new Set(items.filter(Boolean))).sort((a, b) =>
       a.localeCompare(b, 'it', { sensitivity: 'base' })
+    );
+
+  const FilterBar = ({
+    variante,
+    onVarianteChange,
+    colore,
+    onColoreChange,
+    varianti,
+    colori,
+    onReset,
+  }) => {
+    const hasFilters = variante !== 'all' || colore !== 'all';
+
+    return React.createElement(
+      'section',
+      { className: 'bg-white border rounded-xl p-4 sm:p-5 mb-5 card-shadow' },
+      [
+        React.createElement(
+          'div',
+          { key: 'controls', className: 'grid gap-4 sm:grid-cols-2' },
+          [
+            React.createElement(
+              'div',
+              { key: 'variante' },
+              [
+                React.createElement(
+                  'label',
+                  { className: 'block text-sm font-medium text-neutral-700 mb-1' },
+                  'Variante'
+                ),
+                React.createElement(
+                  'select',
+                  {
+                    value: variante,
+                    onChange: (event) => onVarianteChange(event.target.value),
+                    className:
+                      'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
+                  },
+                  [
+                    React.createElement('option', { key: 'all', value: 'all' }, 'Tutte'),
+                    ...varianti.map((value) =>
+                      React.createElement('option', { key: value, value }, value)
+                    ),
+                  ]
+                ),
+              ]
+            ),
+            React.createElement(
+              'div',
+              { key: 'colore' },
+              [
+                React.createElement(
+                  'label',
+                  { className: 'block text-sm font-medium text-neutral-700 mb-1' },
+                  'Colore'
+                ),
+                React.createElement(
+                  'select',
+                  {
+                    value: colore,
+                    onChange: (event) => onColoreChange(event.target.value),
+                    className:
+                      'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
+                  },
+                  [
+                    React.createElement('option', { key: 'all', value: 'all' }, 'Tutti'),
+                    ...colori.map((value) =>
+                      React.createElement('option', { key: value, value }, value)
+                    ),
+                  ]
+                ),
+              ]
+            ),
+          ]
+        ),
+        hasFilters &&
+          React.createElement(
+            'div',
+            { key: 'reset', className: 'mt-4' },
+            React.createElement(
+              'button',
+              {
+                type: 'button',
+                className: 'text-sm text-neutral-700 underline hover:text-neutral-900',
+                onClick: onReset,
+              },
+              'Azzera filtri'
+            )
+          ),
+      ].filter(Boolean)
     );
   };
 
-  const formatCurrency = (value) => {
-    if (value === null || value === undefined || value === '') return '—';
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-    }).format(value);
+  const ImageLightbox = ({ image, onClose }) => {
+    useEffect(() => {
+      if (!image) return;
+      const handler = (event) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handler);
+      return () => window.removeEventListener('keydown', handler);
+    }, [image, onClose]);
+
+    if (!image) return null;
+
+    return React.createElement(
+      'div',
+      {
+        className:
+          'fixed inset-0 z-50 bg-neutral-900/80 backdrop-blur-sm flex items-center justify-center p-4',
+        onClick: onClose,
+        role: 'dialog',
+        'aria-modal': true,
+      },
+      React.createElement('img', {
+        src: image,
+        alt: 'Anteprima ingrandita',
+        className: 'max-h-[90vh] max-w-[90vw] rounded-xl shadow-2xl border border-white/10',
+        onClick: (event) => event.stopPropagation(),
+        onError: (event) => {
+          event.target.onerror = null;
+          event.target.src = 'assets/default.svg';
+        },
+      })
+    );
   };
 
-  const Badge = ({ children }) => (
-    React.createElement('span', { className: 'badge bg-white text-neutral-700' }, children)
-  );
+  const ProductCard = ({ product, onImageClick }) => {
+    const image = product.foto || 'assets/default.svg';
 
-  const Filters = ({
-    query,
-    onQueryChange,
-    settore,
-    onSettoreChange,
-    tipologia,
-    onTipologiaChange,
-    linea,
-    onLineaChange,
-    onlySeasonal,
-    onOnlySeasonalChange,
-    onlyPatented,
-    onOnlyPatentedChange,
-    settori,
-    tipologie,
-    linee,
-  }) => (
-    React.createElement('section', { className: 'bg-white border rounded-xl p-4 sm:p-5 mb-5 card-shadow' }, [
-      React.createElement('div', { className: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4' }, [
-        React.createElement('div', { key: 'search', className: 'sm:col-span-2' }, [
-          React.createElement('label', { className: 'block text-sm font-medium text-neutral-700 mb-1' }, 'Cerca una variante'),
-          React.createElement('input', {
-            type: 'search',
-            value: query,
-            onChange: (event) => onQueryChange(event.target.value),
-            placeholder: 'Codice, articolo, linea, materiale…',
-            className: 'w-full h-11 rounded-lg border px-3 focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
-          }),
-        ]),
-        React.createElement('div', { key: 'settore' }, [
-          React.createElement('label', { className: 'block text-sm font-medium text-neutral-700 mb-1' }, 'Settore'),
-          React.createElement('select', {
-            value: settore,
-            onChange: (event) => onSettoreChange(event.target.value),
-            className: 'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
-          }, [
-            React.createElement('option', { key: 'all', value: 'all' }, 'Tutti'),
-            ...settori.map((option) => React.createElement('option', { key: option, value: option }, option)),
-          ]),
-        ]),
-        React.createElement('div', { key: 'tipologia' }, [
-          React.createElement('label', { className: 'block text-sm font-medium text-neutral-700 mb-1' }, 'Tipologia'),
-          React.createElement('select', {
-            value: tipologia,
-            onChange: (event) => onTipologiaChange(event.target.value),
-            className: 'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
-          }, [
-            React.createElement('option', { key: 'all', value: 'all' }, 'Tutte'),
-            ...tipologie.map((option) => React.createElement('option', { key: option, value: option }, option)),
-          ]),
-        ]),
-        React.createElement('div', { key: 'linea' }, [
-          React.createElement('label', { className: 'block text-sm font-medium text-neutral-700 mb-1' }, 'Linea'),
-          React.createElement('select', {
-            value: linea,
-            onChange: (event) => onLineaChange(event.target.value),
-            className: 'w-full h-11 rounded-lg border px-3 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900/20',
-          }, [
-            React.createElement('option', { key: 'all', value: 'all' }, 'Tutte'),
-            ...linee.map((option) => React.createElement('option', { key: option, value: option }, option)),
-          ]),
-        ]),
-      ]),
-      React.createElement('div', { className: 'mt-4 flex flex-wrap gap-4' }, [
-        React.createElement('label', { key: 'stagionale', className: 'inline-flex items-center gap-2 text-sm text-neutral-700' }, [
-          React.createElement('input', {
-            type: 'checkbox',
-            className: 'h-4 w-4 rounded border-neutral-300',
-            checked: onlySeasonal,
-            onChange: (event) => onOnlySeasonalChange(event.target.checked),
-          }),
-          'Solo stagionali',
-        ]),
-        React.createElement('label', { key: 'brevettato', className: 'inline-flex items-center gap-2 text-sm text-neutral-700' }, [
-          React.createElement('input', {
-            type: 'checkbox',
-            className: 'h-4 w-4 rounded border-neutral-300',
-            checked: onlyPatented,
-            onChange: (event) => onOnlyPatentedChange(event.target.checked),
-          }),
-          'Solo brevettati',
-        ]),
-      ]),
-    ])
-  );
-
-  const ProductCard = ({ product }) => {
-    const image = product.image || 'assets/default.svg';
-    const labels = [];
-    if (product.palette) labels.push(product.palette);
-    if (product.stagionale) labels.push('Stagionale');
-    if (product.brevettato) labels.push('Brevettato');
-    if (product.personalizzabile) labels.push('Personalizzabile');
-    const showPersonalizzabile = product.personalizzabile === true || product.personalizzabile === false;
-
-    return React.createElement('article', { className: 'bg-white border rounded-xl p-5 card-shadow flex flex-col gap-4' }, [
-      React.createElement('div', { key: 'header', className: 'flex items-start gap-4' }, [
-        React.createElement('img', {
-          key: 'image',
-          src: image,
-          alt: product.linea || product.tipologia,
-          className: 'w-20 h-20 object-contain border rounded-lg bg-white',
-          onError: (event) => {
-            event.target.onerror = null;
-            event.target.src = 'assets/default.svg';
+    return React.createElement(
+      'article',
+      { className: 'bg-white border rounded-xl card-shadow overflow-hidden flex flex-col' },
+      [
+        React.createElement(
+          'button',
+          {
+            key: 'image',
+            type: 'button',
+            className:
+              'relative group h-40 bg-neutral-100 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/40',
+            onClick: () => onImageClick(image),
           },
-        }),
-        React.createElement('div', { key: 'info', className: 'flex-1 min-w-0' }, [
-          React.createElement('div', { className: 'flex flex-wrap items-center gap-2' }, [
-            React.createElement('h2', { key: 'title', className: 'text-lg font-semibold text-neutral-900 truncate' }, product.articolo || 'Articolo senza nome'),
-            React.createElement(Badge, { key: 'codice' }, product.codice),
-          ]),
-          React.createElement('p', { className: 'text-sm text-neutral-600 mt-1' }, [
-            product.tipologia ? product.tipologia + ' · ' : '',
-            product.linea || 'Linea non specificata',
-          ]),
-          React.createElement('div', { className: 'mt-2 flex flex-wrap gap-2 text-xs text-neutral-600' }, [
-            product.settore && React.createElement(Badge, { key: 'settore' }, product.settore),
-            product.materiale && React.createElement(Badge, { key: 'materiale' }, product.materiale),
-            product.eco && React.createElement(Badge, { key: 'eco' }, 'Eco ' + product.eco),
-            product.colore && React.createElement(Badge, { key: 'colore' }, product.colore),
-            product.famiglia && React.createElement(Badge, { key: 'famiglia' }, product.famiglia),
-            ...labels.map((label) => React.createElement(Badge, { key: label }, label)),
-          ].filter(Boolean)),
-        ]),
-      ]),
-      (product.disponibilita || showPersonalizzabile || (product.minOrdine !== null && product.minOrdine !== undefined))
-        &&
-        React.createElement('dl', { key: 'meta', className: 'grid gap-2 text-sm text-neutral-600 sm:grid-cols-2' }, [
-          product.disponibilita &&
-            React.createElement('div', { key: 'disponibilita' }, [
-              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Disponibilità'),
-              React.createElement('dd', null, product.disponibilita),
-            ]),
-          showPersonalizzabile &&
-            React.createElement('div', { key: 'personalizzabile' }, [
-              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Personalizzazione'),
-              React.createElement('dd', null, product.personalizzabile ? 'Personalizzabile' : 'Non personalizzabile'),
-            ]),
-          product.minOrdine !== null &&
-            product.minOrdine !== undefined &&
-            React.createElement('div', { key: 'minOrdine' }, [
-              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Minimo ordine'),
-              React.createElement('dd', null, product.minOrdine),
-            ]),
-        ].filter(Boolean)),
-      product.accessori && product.accessori.length > 0 && React.createElement('div', { key: 'accessori' }, [
-        React.createElement('h3', { className: 'text-sm font-medium text-neutral-800' }, 'Accessori disponibili'),
-        React.createElement('p', { className: 'text-sm text-neutral-600 mt-1' }, product.accessori.join(' · ')),
-      ]),
-      React.createElement('div', { key: 'varianti', className: 'overflow-x-auto' }, [
-        React.createElement('table', { className: 'min-w-full border-t text-sm' }, [
-          React.createElement('thead', { className: 'bg-neutral-50 text-neutral-600 uppercase text-xs tracking-wide' }, [
-            React.createElement('tr', { key: 'head-row' }, [
-              ['Codice', 'Formato', 'Confezione', 'Prezzo base', 'Prezzo personalizzato'].map((title) =>
-                React.createElement('th', {
-                  key: title,
-                  className: 'text-left font-semibold px-3 py-2 border-b border-neutral-200',
-                }, title)
-              ),
-            ]),
-          ]),
-          React.createElement('tbody', { className: 'divide-y divide-neutral-200' },
-            (product.varianti || []).map((variant) => React.createElement('tr', { key: variant.codice }, [
-              React.createElement('td', { className: 'px-3 py-2 font-medium text-neutral-800' }, variant.codice || '—'),
-              React.createElement('td', { className: 'px-3 py-2 text-neutral-700' }, variant.size || '—'),
-              React.createElement('td', { className: 'px-3 py-2 text-neutral-700' }, variant.confezione || '—'),
-              React.createElement('td', { className: 'px-3 py-2 text-neutral-700' }, formatCurrency(variant.prezzoAnonimo)),
-              React.createElement('td', { className: 'px-3 py-2 text-neutral-700' }, formatCurrency(variant.prezzoPersonalizzato)),
-            ]))
-          ),
-        ]),
-      ]),
-      product.note &&
-        React.createElement('p', { key: 'note', className: 'text-sm text-neutral-600 italic border-t pt-3' }, product.note),
-      product.smaltimento &&
-        React.createElement('div', { key: 'smaltimento', className: 'border-t pt-3 text-xs text-neutral-500 leading-relaxed' }, [
-          React.createElement('h3', { className: 'text-sm font-medium text-neutral-700 mb-1' }, 'Guida allo smaltimento'),
-          React.createElement('p', null, product.smaltimento),
-        ]),
-    ]);
+          React.createElement('img', {
+            src: image,
+            alt: `Foto articolo ${product.codice}`,
+            className: 'h-36 w-auto max-w-full object-contain transition-transform group-hover:scale-105',
+            onError: (event) => {
+              event.target.onerror = null;
+              event.target.src = 'assets/default.svg';
+            },
+          })
+        ),
+        React.createElement(
+          'div',
+          { key: 'body', className: 'p-5 flex flex-col gap-4 flex-1' },
+          [
+            React.createElement(
+              'p',
+              { key: 'description', className: 'text-sm text-neutral-600 leading-relaxed' },
+              product.descrizione || 'Descrizione non disponibile'
+            ),
+            React.createElement(
+              'dl',
+              {
+                key: 'details',
+                className:
+                  'grid gap-3 text-sm text-neutral-700 sm:grid-cols-2 border-t pt-4 border-neutral-200',
+              },
+              [
+                ['Codice', product.codice],
+                ['Descrizione', product.descrizione],
+                ['Formato', product.formato],
+                ['Cartone', product.cartone],
+              ].map(([label, value]) =>
+                React.createElement(
+                  'div',
+                  { key: label },
+                  [
+                    React.createElement(
+                      'dt',
+                      { className: 'font-medium text-neutral-800 uppercase tracking-wide text-xs' },
+                      label
+                    ),
+                    React.createElement(
+                      'dd',
+                      { className: 'mt-1 text-neutral-700' },
+                      value || '—'
+                    ),
+                  ]
+                )
+              )
+            ),
+            React.createElement(
+              'div',
+              { key: 'tags', className: 'flex flex-wrap gap-2 text-xs text-neutral-600 mt-auto' },
+              [
+                product.variante &&
+                  React.createElement(
+                    'span',
+                    { className: 'badge bg-white text-neutral-700 border-neutral-300' },
+                    product.variante
+                  ),
+                (product.colore || product.linea) &&
+                  React.createElement(
+                    'span',
+                    { className: 'badge bg-white text-neutral-700 border-neutral-300' },
+                    product.colore || product.linea
+                  ),
+                product.linea && product.colore && product.linea !== product.colore &&
+                  React.createElement(
+                    'span',
+                    { className: 'badge bg-white text-neutral-700 border-neutral-300' },
+                    product.linea
+                  ),
+              ].filter(Boolean)
+            ),
+          ]
+        ),
+      ]
+    );
   };
 
   const App = () => {
     const [products, setProducts] = useState([]);
     const [status, setStatus] = useState('loading');
     const [error, setError] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
-    const [query, setQuery] = useState('');
-    const [settore, setSettore] = useState('all');
-    const [tipologia, setTipologia] = useState('all');
-    const [linea, setLinea] = useState('all');
-    const [onlySeasonal, setOnlySeasonal] = useState(false);
-    const [onlyPatented, setOnlyPatented] = useState(false);
+    const [variante, setVariante] = useState('all');
+    const [colore, setColore] = useState('all');
 
     useEffect(() => {
       let cancelled = false;
       setStatus('loading');
+
       fetch('data/catalogo.json')
         .then((response) => {
           if (!response.ok) {
@@ -238,109 +262,112 @@
             setStatus('error');
           }
         });
+
       return () => {
         cancelled = true;
       };
     }, []);
 
-    const settori = useMemo(() => uniqSorted(products.map((item) => item.settore)), [products]);
-    const tipologie = useMemo(() => uniqSorted(products.map((item) => item.tipologia)), [products]);
-    const linee = useMemo(() => uniqSorted(products.map((item) => item.linea)), [products]);
+    const varianti = useMemo(
+      () => uniqSorted(products.map((item) => item.variante)),
+      [products]
+    );
+    const colori = useMemo(
+      () => uniqSorted(products.map((item) => item.colore || item.linea)),
+      [products]
+    );
 
     const filteredProducts = useMemo(() => {
-      const normalizedQuery = query.trim().toLowerCase();
-
       return products.filter((product) => {
-        if (settore !== 'all' && product.settore !== settore) return false;
-        if (tipologia !== 'all' && product.tipologia !== tipologia) return false;
-        if (linea !== 'all' && product.linea !== linea) return false;
-        if (onlySeasonal && !product.stagionale) return false;
-        if (onlyPatented && !product.brevettato) return false;
-
-        if (!normalizedQuery) return true;
-
-        const searchable = [
-          product.codice,
-          product.articolo,
-          product.tipologia,
-          product.settore,
-          product.linea,
-          product.materiale,
-          product.eco,
-          product.famiglia,
-          product.colore,
-          product.palette,
-          product.disponibilita,
-          product.note,
-          product.minOrdine ? String(product.minOrdine) : null,
-          product.personalizzabile === true
-            ? 'personalizzabile'
-            : product.personalizzabile === false
-            ? 'non personalizzabile'
-            : null,
-          product.smaltimento,
-          ...(product.varianti || []).flatMap((variant) => [variant.codice, variant.size]),
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-
-        return searchable.includes(normalizedQuery);
+        if (variante !== 'all' && product.variante !== variante) return false;
+        if (colore !== 'all' && (product.colore || product.linea) !== colore) return false;
+        return true;
       });
-    }, [products, query, settore, tipologia, linea, onlySeasonal, onlyPatented]);
+    }, [products, variante, colore]);
 
     if (status === 'loading') {
-      return React.createElement('div', { className: 'py-24 text-center text-neutral-500' }, 'Caricamento del catalogo in corso…');
+      return React.createElement(
+        'div',
+        { className: 'py-24 text-center text-neutral-500' },
+        'Caricamento del catalogo in corso…'
+      );
     }
 
     if (status === 'error') {
-      return React.createElement('div', { className: 'py-24 text-center text-red-600' }, error?.message || 'Si è verificato un errore.');
+      return React.createElement(
+        'div',
+        { className: 'py-24 text-center text-red-600' },
+        error?.message || 'Si è verificato un errore.'
+      );
     }
 
-    return React.createElement(React.Fragment, null, [
-      React.createElement(Filters, {
-        key: 'filters',
-        query,
-        onQueryChange: setQuery,
-        settore,
-        onSettoreChange: setSettore,
-        tipologia,
-        onTipologiaChange: setTipologia,
-        linea,
-        onLineaChange: setLinea,
-        onlySeasonal,
-        onOnlySeasonalChange: setOnlySeasonal,
-        onlyPatented,
-        onOnlyPatentedChange: setOnlyPatented,
-        settori,
-        tipologie,
-        linee,
-      }),
-      React.createElement('div', { key: 'summary', className: 'flex items-center justify-between mb-4 text-sm text-neutral-600' }, [
-        React.createElement('span', { key: 'count' }, `${filteredProducts.length} articoli visibili su ${products.length}`),
-        (onlySeasonal || onlyPatented || settore !== 'all' || tipologia !== 'all' || linea !== 'all' || query) &&
-          React.createElement('button', {
-            key: 'reset',
-            className: 'text-neutral-700 underline hover:text-neutral-900',
-            onClick: () => {
-              setQuery('');
-              setSettore('all');
-              setTipologia('all');
-              setLinea('all');
-              setOnlySeasonal(false);
-              setOnlyPatented(false);
-            },
-          }, 'Azzera filtri'),
-      ].filter(Boolean)),
-      filteredProducts.length === 0
-        ? React.createElement('div', { key: 'empty', className: 'py-20 text-center text-neutral-500 border border-dashed rounded-xl' }, [
-            React.createElement('p', { key: 'title', className: 'text-lg font-medium text-neutral-700' }, 'Nessun articolo trovato'),
-            React.createElement('p', { key: 'hint', className: 'mt-2 text-sm' }, 'Modifica la ricerca o reimposta i filtri per vedere più risultati.'),
-          ])
-        : React.createElement('div', { key: 'grid', className: 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' },
-            filteredProducts.map((product) => React.createElement(ProductCard, { key: product.codice, product }))
-          ),
-    ]);
+    return React.createElement(
+      React.Fragment,
+      null,
+      [
+        React.createElement(FilterBar, {
+          key: 'filters',
+          variante,
+          onVarianteChange: setVariante,
+          colore,
+          onColoreChange: setColore,
+          varianti,
+          colori,
+          onReset: () => {
+            setVariante('all');
+            setColore('all');
+          },
+        }),
+        React.createElement(
+          'div',
+          { key: 'summary', className: 'flex items-center justify-between mb-4 text-sm text-neutral-600' },
+          [
+            React.createElement(
+              'span',
+              { key: 'count' },
+              `${filteredProducts.length} articoli visibili su ${products.length}`
+            ),
+          ]
+        ),
+        filteredProducts.length === 0
+          ? React.createElement(
+              'div',
+              {
+                key: 'empty',
+                className:
+                  'py-20 text-center text-neutral-500 border border-dashed rounded-xl',
+              },
+              [
+                React.createElement(
+                  'p',
+                  { key: 'title', className: 'text-lg font-medium text-neutral-700' },
+                  'Nessun articolo trovato'
+                ),
+                React.createElement(
+                  'p',
+                  { key: 'hint', className: 'mt-2 text-sm' },
+                  'Modifica i filtri per visualizzare altri articoli.'
+                ),
+              ]
+            )
+          : React.createElement(
+              'div',
+              { key: 'grid', className: 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' },
+              filteredProducts.map((product) =>
+                React.createElement(ProductCard, {
+                  key: product.codice,
+                  product,
+                  onImageClick: setSelectedImage,
+                })
+              )
+            ),
+        React.createElement(ImageLightbox, {
+          key: 'lightbox',
+          image: selectedImage,
+          onClose: () => setSelectedImage(null),
+        }),
+      ]
+    );
   };
 
   const container = document.getElementById('root');
