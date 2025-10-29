@@ -112,6 +112,8 @@
     if (product.palette) labels.push(product.palette);
     if (product.stagionale) labels.push('Stagionale');
     if (product.brevettato) labels.push('Brevettato');
+    if (product.personalizzabile) labels.push('Personalizzabile');
+    const showPersonalizzabile = product.personalizzabile === true || product.personalizzabile === false;
 
     return React.createElement('article', { className: 'bg-white border rounded-xl p-5 card-shadow flex flex-col gap-4' }, [
       React.createElement('div', { key: 'header', className: 'flex items-start gap-4' }, [
@@ -138,10 +140,32 @@
             product.settore && React.createElement(Badge, { key: 'settore' }, product.settore),
             product.materiale && React.createElement(Badge, { key: 'materiale' }, product.materiale),
             product.eco && React.createElement(Badge, { key: 'eco' }, 'Eco ' + product.eco),
+            product.colore && React.createElement(Badge, { key: 'colore' }, product.colore),
+            product.famiglia && React.createElement(Badge, { key: 'famiglia' }, product.famiglia),
             ...labels.map((label) => React.createElement(Badge, { key: label }, label)),
           ].filter(Boolean)),
         ]),
       ]),
+      (product.disponibilita || showPersonalizzabile || (product.minOrdine !== null && product.minOrdine !== undefined))
+        &&
+        React.createElement('dl', { key: 'meta', className: 'grid gap-2 text-sm text-neutral-600 sm:grid-cols-2' }, [
+          product.disponibilita &&
+            React.createElement('div', { key: 'disponibilita' }, [
+              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Disponibilità'),
+              React.createElement('dd', null, product.disponibilita),
+            ]),
+          showPersonalizzabile &&
+            React.createElement('div', { key: 'personalizzabile' }, [
+              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Personalizzazione'),
+              React.createElement('dd', null, product.personalizzabile ? 'Personalizzabile' : 'Non personalizzabile'),
+            ]),
+          product.minOrdine !== null &&
+            product.minOrdine !== undefined &&
+            React.createElement('div', { key: 'minOrdine' }, [
+              React.createElement('dt', { className: 'font-medium text-neutral-700' }, 'Minimo ordine'),
+              React.createElement('dd', null, product.minOrdine),
+            ]),
+        ].filter(Boolean)),
       product.accessori && product.accessori.length > 0 && React.createElement('div', { key: 'accessori' }, [
         React.createElement('h3', { className: 'text-sm font-medium text-neutral-800' }, 'Accessori disponibili'),
         React.createElement('p', { className: 'text-sm text-neutral-600 mt-1' }, product.accessori.join(' · ')),
@@ -169,6 +193,8 @@
           ),
         ]),
       ]),
+      product.note &&
+        React.createElement('p', { key: 'note', className: 'text-sm text-neutral-600 italic border-t pt-3' }, product.note),
       product.smaltimento &&
         React.createElement('div', { key: 'smaltimento', className: 'border-t pt-3 text-xs text-neutral-500 leading-relaxed' }, [
           React.createElement('h3', { className: 'text-sm font-medium text-neutral-700 mb-1' }, 'Guida allo smaltimento'),
@@ -241,7 +267,17 @@
           product.linea,
           product.materiale,
           product.eco,
+          product.famiglia,
+          product.colore,
           product.palette,
+          product.disponibilita,
+          product.note,
+          product.minOrdine ? String(product.minOrdine) : null,
+          product.personalizzabile === true
+            ? 'personalizzabile'
+            : product.personalizzabile === false
+            ? 'non personalizzabile'
+            : null,
           product.smaltimento,
           ...(product.varianti || []).flatMap((variant) => [variant.codice, variant.size]),
         ]

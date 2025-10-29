@@ -18,6 +18,11 @@ const normalizeBoolean = (value) => {
   return false;
 };
 
+const normalizeOptionalBoolean = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  return normalizeBoolean(value);
+};
+
 const toNumberOrNull = (value) => {
   if (value === null || value === undefined || value === '') return null;
   const numeric = Number(value);
@@ -186,8 +191,16 @@ const normalizeProduct = (raw) => {
     linea: raw.linea || null,
     materiale: raw.materiale || null,
     eco: raw.eco || null,
+    famiglia: raw.famiglia || null,
+    colore: raw.colore || raw.color || null,
     stagionale: normalizeBoolean(raw.stagionale),
     brevettato: normalizeBoolean(raw.brevettato),
+    personalizzabile: normalizeOptionalBoolean(raw.personalizzabile),
+    disponibilita: raw.disponibilita || raw.disponibilità || null,
+    minOrdine: toNumberOrNull(raw.minOrdine ?? raw.min_ordine ?? raw.minimoOrdine),
+    note: Array.isArray(raw.note)
+      ? raw.note.filter(Boolean).join(' · ')
+      : raw.note || null,
     accessori: Array.isArray(raw.accessori)
       ? raw.accessori.filter(Boolean)
       : raw.accessori
@@ -208,6 +221,38 @@ const normalizeProduct = (raw) => {
     image: raw.image || null,
   };
 
+  const topLevelVariant = {
+    codice: raw.codiceVariante || raw.variantCodice || raw.codiceVar || raw.codiceVariante || raw.codice || null,
+    size: raw.size || raw.formato || null,
+    confezione: raw.confezione || null,
+    prezzoAnonimo: toNumberOrNull(raw.prezzoAnonimo),
+    prezzoPersonalizzato: toNumberOrNull(raw.prezzoPersonalizzato),
+  };
+
+  const hasVariantData = Boolean(
+    (topLevelVariant.codice && topLevelVariant.codice !== product.codice) ||
+      topLevelVariant.size ||
+      topLevelVariant.confezione ||
+      topLevelVariant.prezzoAnonimo !== null ||
+      topLevelVariant.prezzoPersonalizzato !== null
+  );
+
+  if (hasVariantData) {
+    const existingKeys = new Set(
+      product.varianti.map((variant) => [variant.codice, variant.size, variant.confezione].join('::'))
+    );
+    const key = [topLevelVariant.codice || product.codice, topLevelVariant.size, topLevelVariant.confezione].join('::');
+    if (!existingKeys.has(key)) {
+      product.varianti.push({
+        codice: topLevelVariant.codice || product.codice || null,
+        size: topLevelVariant.size || null,
+        confezione: topLevelVariant.confezione || null,
+        prezzoAnonimo: topLevelVariant.prezzoAnonimo,
+        prezzoPersonalizzato: topLevelVariant.prezzoPersonalizzato,
+      });
+    }
+  }
+
   return product;
 };
 
@@ -223,6 +268,9 @@ const mergeProducts = (target, source) => {
     'linea',
     'materiale',
     'eco',
+    'famiglia',
+    'colore',
+    'disponibilita',
     'image',
   ];
 
@@ -234,6 +282,41 @@ const mergeProducts = (target, source) => {
 
   target.stagionale = Boolean(target.stagionale || source.stagionale);
   target.brevettato = Boolean(target.brevettato || source.brevettato);
+  const personalizzabileValues = [target.personalizzabile, source.personalizzabile].filter(
+    (value) => value !== null && value !== undefined
+  );
+  if (personalizzabileValues.length) {
+    target.personalizzabile = personalizzabileValues.includes(true)
+      ? true
+      : personalizzabileValues.includes(false)
+      ? false
+      : target.personalizzabile;
+  }
+
+  if (source.minOrdine !== null && source.minOrdine !== undefined) {
+    if (target.minOrdine === null || target.minOrdine === undefined) {
+      target.minOrdine = source.minOrdine;
+    } else {
+      target.minOrdine = Math.min(target.minOrdine, source.minOrdine);
+    }
+  }
+
+  if (source.note) {
+    const notes = new Set();
+    if (target.note) {
+      target.note
+        .split(/\s*·\s*/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .forEach((item) => notes.add(item));
+    }
+    source.note
+      .split(/\s*·\s*/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .forEach((item) => notes.add(item));
+    target.note = notes.size ? Array.from(notes).join(' · ') : target.note;
+  }
 
   if (Array.isArray(source.accessori) && source.accessori.length) {
     const set = new Set([...(target.accessori || []), ...source.accessori]);
@@ -257,7 +340,27 @@ const mergeProducts = (target, source) => {
         seen.add(key);
         return true;
       });
-    target.varianti = merged;
+    const byPackage = new Map();
+    const prioritized = [];
+    merged.forEach((variant) => {
+      const code = variant.codice || '';
+      const pack = variant.confezione || '';
+      const key = `${code}::${pack}`;
+      const score = [variant.size ? 1 : 0, variant.prezzoAnonimo !== null ? 1 : 0, variant.prezzoPersonalizzato !== null ? 1 : 0].reduce(
+        (total, value) => total + value,
+        0
+      );
+      const existing = byPackage.get(key);
+      if (!existing) {
+        byPackage.set(key, { variant, score });
+        prioritized.push(variant);
+      } else if (score > existing.score) {
+        const index = prioritized.indexOf(existing.variant);
+        prioritized[index] = variant;
+        byPackage.set(key, { variant, score });
+      }
+    });
+    target.varianti = prioritized;
   }
 
   return target;
