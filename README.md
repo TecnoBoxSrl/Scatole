@@ -1,0 +1,1 @@
+Deploy: carica file, abilita GitHub Pages (Deploy from branch /root).

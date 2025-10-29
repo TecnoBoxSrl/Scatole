@@ -1,0 +1,1 @@
+Palette consigliate per linee: Rossi/Bordeaux, Verdi/Blu, Chiari/Neutri, Speciali.

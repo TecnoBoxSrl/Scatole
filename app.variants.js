@@ -1,0 +1,1 @@
+(function(){document.getElementById('root').innerHTML='Carica app.variants.js aggiornato';})();

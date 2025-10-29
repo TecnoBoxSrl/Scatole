@@ -1,0 +1,1 @@
+PAP21 → Carta; PET1/PP5 → Plastica; separare componenti; verificare disposizioni locali.

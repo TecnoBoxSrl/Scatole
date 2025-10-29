@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Confezioni · Seleziona · Personalizza · Richiedi</title>
+<link rel="icon" href="assets/logo.svg"><link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head><body class="bg-neutral-50 text-neutral-900 min-h-screen">
+<div class="palette-bar"></div>
+<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b"><div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+<img src="assets/logo.svg" class="w-7 h-7" alt="Logo"/><h1 class="text-lg sm:text-xl font-semibold">Confezioni – Seleziona · Personalizza · Richiedi</h1>
+<div class="ml-auto"><button class="px-3 h-9 rounded-md border" onclick="window.print()">Stampa</button></div>
+</div></header>
+<main id="root" class="max-w-7xl mx-auto px-4 py-4"></main>
+<footer class="border-t text-xs text-neutral-500"><div class="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between"><div>© <span id="year"></span> – WebApp Confezioni.</div><a class="underline" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Torna su</a></div></footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="app.variants.js"></script></body></html>
