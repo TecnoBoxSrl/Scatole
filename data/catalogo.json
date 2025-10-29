@@ -1,0 +1,125 @@
+[
+  {
+    "codice": "138226S",
+    "articolo": "Portapanettone + Bott. 280x200x350",
+    "tipologia": "Portapanettone + Bottiglia",
+    "settore": "Gastronomia",
+    "linea": "CRYSTAL",
+    "materiale": "Cartoncino LINO",
+    "eco": "PAP 21",
+    "famiglia": null,
+    "colore": "Bianco/Lino",
+    "stagionale": false,
+    "brevettato": false,
+    "personalizzabile": true,
+    "disponibilita": "Su richiesta",
+    "minOrdine": 1,
+    "note": "Finestra e varianti misure a listino",
+    "accessori": [],
+    "varianti": [
+      {
+        "codice": "138226S",
+        "size": null,
+        "confezione": "20 pz",
+        "prezzoAnonimo": 3.5,
+        "prezzoPersonalizzato": 4.1
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1541976076758-347942db1970?w=800",
+    "palette": "CHIARI_NEUTRI",
+    "smaltimento": "PAP21 → Carta; PET1/PP5 → Plastica; separare componenti; verificare disposizioni locali."
+  },
+  {
+    "codice": "138500S",
+    "articolo": "Scat. 1 Bott. c/Maniglia 90x90x385",
+    "tipologia": "Scatola Bottiglie",
+    "settore": "Enoteca",
+    "linea": "SPOT BLU",
+    "materiale": "Cartoncino",
+    "eco": "PAP 21",
+    "famiglia": null,
+    "colore": "Blu",
+    "stagionale": false,
+    "brevettato": false,
+    "personalizzabile": false,
+    "disponibilita": "Pronta",
+    "minOrdine": 1,
+    "note": "Maniglia rinforzata",
+    "accessori": [],
+    "varianti": [
+      {
+        "codice": "138500S",
+        "size": null,
+        "confezione": "50 pz",
+        "prezzoAnonimo": 1.2,
+        "prezzoPersonalizzato": 1.2
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800",
+    "palette": "VERDI_BLU",
+    "smaltimento": "PAP21 → Carta; PET1/PP5 → Plastica; separare componenti; verificare disposizioni locali."
+  },
+  {
+    "codice": "130806S",
+    "articolo": "Scat. 2 Bottiglie F. 180x90x385",
+    "tipologia": "Scatola Bottiglie",
+    "settore": "Enoteca",
+    "linea": "SETA VERDE",
+    "materiale": "Cartoncino SETA",
+    "eco": "PAP 21",
+    "famiglia": null,
+    "colore": "Verde",
+    "stagionale": false,
+    "brevettato": false,
+    "personalizzabile": true,
+    "disponibilita": "Pronta",
+    "minOrdine": 1,
+    "note": "Inserto divisorio opzionale",
+    "accessori": [],
+    "varianti": [
+      {
+        "codice": "130806S",
+        "size": null,
+        "confezione": "30 pz",
+        "prezzoAnonimo": 1.95,
+        "prezzoPersonalizzato": 2.35
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1514361892635-6b07e31e75d7?w=800",
+    "palette": "VERDI_BLU",
+    "smaltimento": "PAP21 → Carta; PET1/PP5 → Plastica; separare componenti; verificare disposizioni locali."
+  },
+  {
+    "codice": "130419S",
+    "articolo": "Vassoio 500x375x160",
+    "tipologia": "Vassoio",
+    "settore": "Pasticceria",
+    "linea": "FIBRA ROSSO",
+    "materiale": "Cartoncino FIBRA",
+    "eco": "PAP 21",
+    "famiglia": null,
+    "colore": "Rosso",
+    "stagionale": false,
+    "brevettato": false,
+    "personalizzabile": true,
+    "disponibilita": "Pronta",
+    "minOrdine": 1,
+    "note": "Linea natalizia – misure multiple disponibili",
+    "accessori": [
+      "Coperchio trasparente",
+      "Disco alimentare"
+    ],
+    "varianti": [
+      {
+        "codice": "130419S",
+        "size": "500x375x160",
+        "confezione": "25 pz",
+        "prezzoAnonimo": 2.3,
+        "prezzoPersonalizzato": 2.7
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1542831369-5b6a04c4a6f6?w=800",
+    "palette": "ROSSI_BORDEAUX",
+    "smaltimento": "PAP21 → Carta; PET1/PP5 → Plastica; separare componenti; verificare disposizioni locali."
+  }
+]
