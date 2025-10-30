@@ -17,10 +17,16 @@ ASSET_RULES = [
     ("CRYSTAL", "assets/linea_CRYSTAL.svg"),
 ]
 
-# Mappa di override per codici con immagini specifiche fornite manualmente.
-CUSTOM_ASSETS = {
-    "101007S": "assets/prodotti/101007S.svg",
-}
+ASSET_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".svg")
+
+
+def resolve_custom_asset(codice: str) -> str | None:
+    base = BASE_DIR / "assets" / "prodotti"
+    for extension in ASSET_EXTENSIONS:
+        candidate = base / f"{codice}{extension}"
+        if candidate.exists():
+            return f"assets/prodotti/{codice}{extension}"
+    return None
 
 PREFIX_MAP = [
     ("portapanettone + bott.", "Portapanettone + Bott."),
@@ -148,7 +154,7 @@ def main() -> None:
                 "colore": derive_colore(linea) or None,
                 "formato": format_dimension(dimensioni),
                 "cartone": "Non specificato",
-                "foto": CUSTOM_ASSETS.get(codice) or derive_foto(linea),
+                "foto": resolve_custom_asset(codice) or derive_foto(linea),
             }
             records.append(record)
 
