@@ -1,4 +1,4 @@
-import { readFile, writeFile, access } from 'fs/promises';
+import { readFile, access } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -6,7 +6,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const dataDir = path.join(rootDir, 'data');
-const outputPath = path.join(dataDir, 'catalogo.json');
 const sourcePath = path.join(dataDir, 'prodotti.json');
 
 const isHttpUrl = (value) => /^https?:\/\//i.test(value ?? '');
@@ -49,7 +48,7 @@ const loadProducts = async () => {
   return data;
 };
 
-const buildCatalog = async () => {
+const validateCatalog = async () => {
   const rawProducts = await loadProducts();
   const seenCodes = new Set();
   const products = [];
@@ -99,13 +98,12 @@ const buildCatalog = async () => {
 
   products.sort((a, b) => a.codice.localeCompare(b.codice, 'it', { sensitivity: 'base' }));
 
-  const payload = JSON.stringify(products, null, 2);
-  await writeFile(outputPath, payload + '\n', 'utf8');
+  return products;
 };
 
-buildCatalog()
-  .then(() => {
-    console.log(`Catalogo generato in ${path.relative(rootDir, outputPath)}`);
+validateCatalog()
+  .then((products) => {
+    console.log(`Catalogo validato: ${products.length} articoli in ${path.relative(rootDir, sourcePath)}`);
   })
   .catch((error) => {
     console.error(error.message || error);

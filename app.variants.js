@@ -268,7 +268,16 @@
       let cancelled = false;
       setStatus('loading');
 
-      fetch('data/catalogo.json')
+      const requestUrl = new URL('data/prodotti.json', window.location.href);
+      requestUrl.searchParams.set('v', Date.now().toString(36));
+
+      fetch(requestUrl.toString(), {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
+      })
         .then((response) => {
           if (!response.ok) {
             throw new Error('Impossibile caricare il catalogo (' + response.status + ')');
