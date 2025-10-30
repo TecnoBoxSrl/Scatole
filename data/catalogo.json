@@ -1,0 +1,42 @@
+[
+  {
+    "codice": "130419S",
+    "descrizione": "Vassoio rigido per pasticceria 500x375x160 mm",
+    "formato": "500×375×160 mm",
+    "cartone": "25 pezzi",
+    "variante": "Vassoio",
+    "linea": "FIBRA ROSSO",
+    "colore": "Rosso",
+    "foto": "https://images.unsplash.com/photo-1542831369-5b6a04c4a6f6?w=800"
+  },
+  {
+    "codice": "130806S",
+    "descrizione": "Scatola due bottiglie finestrata 180×90×385 mm",
+    "formato": "180×90×385 mm",
+    "cartone": "30 pezzi",
+    "variante": "Scatola bottiglie",
+    "linea": "SETA VERDE",
+    "colore": "Verde",
+    "foto": "https://images.unsplash.com/photo-1514361892635-6b07e31e75d7?w=800"
+  },
+  {
+    "codice": "138226S",
+    "descrizione": "Scatola portapanettone con alloggio bottiglia 280×200×350 mm",
+    "formato": "280×200×350 mm",
+    "cartone": "20 pezzi",
+    "variante": "Portapanettone con bottiglia",
+    "linea": "CRYSTAL",
+    "colore": "Bianco/Lino",
+    "foto": "https://images.unsplash.com/photo-1541976076758-347942db1970?w=800"
+  },
+  {
+    "codice": "138500S",
+    "descrizione": "Scatola singola bottiglia con maniglia 90×90×385 mm",
+    "formato": "90×90×385 mm",
+    "cartone": "50 pezzi",
+    "variante": "Scatola bottiglie",
+    "linea": "SPOT BLU",
+    "colore": "Blu",
+    "foto": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800"
+  }
+]
