@@ -17,6 +17,11 @@ ASSET_RULES = [
     ("CRYSTAL", "assets/linea_CRYSTAL.svg"),
 ]
 
+# Mappa di override per codici con immagini specifiche fornite manualmente.
+CUSTOM_ASSETS = {
+    "101007S": "assets/prodotti/101007S.svg",
+}
+
 PREFIX_MAP = [
     ("portapanettone + bott.", "Portapanettone + Bott."),
     ("portapanettone portapanettone", "Portapanettone"),
@@ -143,7 +148,7 @@ def main() -> None:
                 "colore": derive_colore(linea) or None,
                 "formato": format_dimension(dimensioni),
                 "cartone": "Non specificato",
-                "foto": derive_foto(linea),
+                "foto": CUSTOM_ASSETS.get(codice) or derive_foto(linea),
             }
             records.append(record)
 
